@@ -1,0 +1,115 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+
+```{r}
+set.seed(27)
+library(dplyr)
+library(ggplot2)
+```
+
+```{r}
+mean1 <- 1
+ninstance <-4000
+class1 <- matrix(rnorm(n = ninstance, mean=mean1, sd= 1),ncol=2)
+
+ListMeanDifClass2 <- c(0:20)
+
+ListMeanDifClass2 <- ListMeanDifClass2/4
+
+# ListnClassMin <- c(2000,
+# 667,
+# 400,
+# 333,
+# 286,
+# 250,
+# 222,
+# 200,
+# 182
+# )
+ListnClassMin <- c(
+20,
+40,
+100,
+200,
+400,
+600,
+800,
+1000,
+1200,
+1400,
+1600,
+1800,
+2000)
+
+
+matClass2 <- NA
+for (dif in ListMeanDifClass2)
+{
+   mean2 <- mean1 + dif
+   class2 <- matrix(rnorm(n = ninstance, mean=mean2, sd= 1),ncol=2)
+   
+   if (dif == 0)
+   {
+     matClass2 <- data.frame(dif = dif, class2 = class2)
+   }
+   else
+   {
+     matClass2 <- rbind(matClass2, data.frame(dif = dif, class2 = class2))
+   }
+}
+
+
+
+matClass2
+
+```
+
+Exemplo classe ok
+```{r}
+class1A <- cbind(0,class1[1:50,])
+class2A <- cbind(1,(matClass2 %>% filter(matClass2$dif == 2.25))[1:50,2:3])
+
+colnames(class1A) <-c("class", "X", "Y")
+colnames(class2A) <-c("class", "X", "Y")
+
+matA <- as.data.frame(rbind(class1A, class2A))
+
+colnames(matA) <-c("class", "X", "Y")
+
+matA$class <- as.factor(matA$class)
+
+ggplot(data =matA, aes(x=matA$X, y=matA$Y, shape=matA$class, color=matA$class)) +
+  geom_point(size=2, shape=23)
+
+```
+
+Criando os datasets
+```{r}
+for (dif in ListMeanDifClass2)
+{
+  class1A <- cbind(class1[,],0)
+  matClassFilter <- matClass2[matClass2$dif == dif,]
+  
+  
+  for (nmin in ListnClassMin)
+  {
+    #print(nmin)
+    class2A <- cbind(matClassFilter[1:nmin,2:3],1)
+  
+    colnames(class1A) <-c("X1", "X2", "Y")
+    colnames(class2A) <-c("X1", "X2", "Y")
+  
+    matA <- as.data.frame(rbind(class1A, class2A))
+  
+    write.csv(matA, paste("DatasetOutputCriacao/overlap", dif, "_classmin", nmin, ".csv", sep = ""), row.names=FALSE)
+  }
+}
+```
+

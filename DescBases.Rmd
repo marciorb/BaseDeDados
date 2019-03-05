@@ -1,0 +1,139 @@
+---
+title: "Bases de dados"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+
+---
+Carregando R utilizado
+```{r}
+source("R/GetDataSet.R")
+source("R/GetDatasetdesc.R")
+```
+
+
+
+
+Existem diferentes bases disponiveis que podem ser usadas para o trabalho de classificação, reais e artificiais.
+
+
+As bases reais foram retiradas do site da UCI https://archive.ics.uci.edu/ml/datasets.html e incluidos em arquivos csv. São bases de diferentes caracteristicas , numero de atributos e exemplares e diferentes niveis de desbalanceamento. As bases são as abaixo:
+
+
+\begin{table}[htbp]
+\small
+%\begin{adjustbox}{width=1\textwidth}
+\begin{tabular}{clclccl}
+\hline
+   & Base         & \# Exemplares & Classe Positiva & \% Classe Positiva & \# Atributos & Link                                                                             \\ \hline
+1  & Ecoli        & 336           & pp              & 15\%               & 7            & https://archive.ics.uci.edu/ml/datasets/ecoli                                    \\
+2  & Glass        & 214           & 6               & 4\%                & 9            & https://archive.ics.uci.edu/ml/datasets/glass+identification                     \\
+3  & Haberman     & 306           & 2               & 26\%               & 3            & https://archive.ics.uci.edu/ml/datasets/Haberman's+Survival                      \\
+4  & Heart        & 303           & 1,2,3,4         & 4\%                & 13           & https://archive.ics.uci.edu/ml/datasets/heart+Disease                            \\
+5  & Hepatitis    & 155           & 1               & 21\%               & 19           & https://archive.ics.uci.edu/ml/datasets/hepatitis                                \\
+6  & Iris         & 150           & versicolor      & 33\%               & 4            & https://archive.ics.uci.edu/ml/datasets/iris                                     \\
+7  & Libra        & 360           & 1,2,3           & 20\%               & 90           & https://archive.ics.uci.edu/ml/datasets/Libras+Movement                          \\
+8  & Mamographic  & 961           & Malign          & 46\%               & 5            & http://archive.ics.uci.edu/ml/datasets/mammographic+mass                         \\
+9  & Pima         & 768           & 1               & 35\%               & 8            & https://archive.ics.uci.edu/ml/machine-learning-databases/pima-indians-diabetes/ \\
+10 & SPECTF-Heart & 268           & 0               & 21\%               & 44           & https://archive.ics.uci.edu/ml/datasets/SPECTF+Heart                             \\
+11 & Wine         & 178           & 2               & 40\%               & 13           & https://archive.ics.uci.edu/ml/datasets/wine                                     \\
+12 & Wiscosin     & 699           & malign          & 34\%               & 9            & https://archive.ics.uci.edu/ml/datasets/breast+cancer+wisconsin+\%28original\%29 \\ \hline
+\end{tabular}
+%\end{adjustbox}
+\caption{Tabela com as bases utilizadas da UCI.} 
+\label{tab:BaseUCIResumo}
+\end{table}
+
+As diferentes bases identificadas pelo código conforme abaixo:
+```{r}
+ListClass <- c("Iris",
+                "GlassLabel6",
+                "ecoli",
+                "haberman","wine","pima","libra1","libra123","vowel",
+                "mamographic", "heart4", "heartnot0","wiscosin","newthyroid",
+                "SPECTFheart","hepatitis")
+
+ListClass
+```
+
+Para obter as bases podem ser consultas usando a função R disponibilizada que retonar o resultado em função de X e Y (atributo alvo). Também esta disponivel uma função para consultar uma descrição da mesma:
+
+```{r}
+  DataSetName <- "GlassLabel6"
+  ds <- GetDataSet(DataSetName)
+  X <- ds$X
+  Y <- ds$Y
+  
+  DataSetDesc <- GetDatasetdesc(DataSetName)
+  
+  head(X, 10)
+    head(Y, 10)
+  
+```
+
+
+
+
+
+Também existem as bases artificiais são varias bases com diferentes niveis de sobreposição e desbalanceamento. As bases foram usadas utilizando o código disponivel em "Exemplo\\GeracaoClasse.rmd"
+
+As usadas no meu trabalho também foram gravada em csv e podem ser acessadas de forma semelhante a real:
+
+
+```{r}
+ListMeanDifClass2 <- c(0:10)
+
+ListMeanDifClass2 <- ListMeanDifClass2/2
+
+ListnClassMin <- c(500,
+409,
+333,
+269,
+214,
+167,
+125,
+88,
+56,
+26,
+5
+)
+    
+for (dif in ListMeanDifClass2)
+{
+    for (nmin in ListnClassMin)
+  {
+    DataSetName <-paste("overlap", dif, "_classmin", nmin, sep = "")
+    print(DataSetName)
+  }
+}
+```
+
+Os mesmos podem ser carregados de forma semalhante as bases reais:
+
+```{r}
+  DataSetName <- "overlap2_classmin88"
+  ds <- GetDataSet(DataSetName)
+  X <- ds$X
+  Y <- ds$Y
+  
+  DataSetDesc <- GetDatasetdesc(DataSetName)
+  
+  head(X, 10)
+    head(Y, 10)
+  
+```
+
+
+
+Para divisão em k-pastas usei a função abaixo:
+
+```{r}
+  library(cvTools)
+  numeroFolder <- 10 
+  pastas <- cvFolds(length(Y), K = numeroFolder, type = "random")
+
+
+```
+
+Caso seja interessante já criar pastas, podemos usar alguma seed. Só ver se é interessante usar o metodo random ou outro como estratificado.
