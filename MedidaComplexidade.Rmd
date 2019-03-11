@@ -1,0 +1,52 @@
+---
+title: "R Notebook"
+output:
+  pdf_document: default
+  html_notebook: default
+---
+
+Segue abaixo o calculo das medidas de complexidade
+
+
+Exemplo usando as classes reais:
+
+
+```{r}
+source("R/GetDataSet.R")
+source("R/DataComplexityCalculate.R")
+
+
+
+
+ListClass<- c("ecoli",
+"GlassLabel6",
+"haberman"
+)
+
+df <- NA
+#sobrescrevendo
+
+for (classname in ListClass)
+{
+  
+  print(classname)
+  dataset1 <- as.data.frame( GetDataSet(classname))
+  
+  F1Data <- CalculateF1(dataset1)
+  F2Data <- CalculateF2(dataset1)
+  N2Data <- CalculateN2(dataset1)
+  
+  F3Data <- CalculateF3(dataset1)
+  D2D3Data <- CalculateD2D3(dataset1, 5)
+  
+  
+  if (classname == "ecoli")
+    df <- cbind(classname, F1Data, F2Data, N2Data, F3Data, D2D3Data)
+  else
+    df <- rbind(df, cbind(classname, F1Data, F2Data, N2Data, F3Data, D2D3Data))
+  
+}
+
+df
+```
+
